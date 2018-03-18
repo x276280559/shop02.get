@@ -69,7 +69,7 @@
                             </div>
                             <div class="cart-tab-5">
                                 <div class="cart-item-opration">
-                                    <a href="javascript:;" class="item-edit-btn">
+                                    <a href="javascript:;" class="item-edit-btn" v-on:click="del(index)">
                                         <svg class="icon icon-del">
                                             <use xlink:href="#icon-del"></use>
                                         </svg>
@@ -178,6 +178,25 @@ export default {  //曝光组件
   },
   //方法
   methods:{
+      //购物车删除功能
+      del(i){
+          //alert(i) //测试
+          var productId = this.ArrData[i].productId   //获取下标ID
+          this.axios.post("/api/users/cartDel",{
+              productId:productId     //发送ID给后台去请求
+          }).then( (res)=>{
+              console.log(res) 
+              var data = res.data
+              console.log(data)
+              if(data.status==0){  //当请求数据成功删除
+                 //再删除界面的列表商品
+                  //this.ArrData[i].remove()    擦。remove是jQuery方法，不能用在这里，下次注意！！
+                  this.ArrData.splice(i,1)   //用数组方法清除
+              }
+              
+          })
+      },
+      //挂载后，请求数据回来
       loadData(){
           this.axios.get("/api/users/cartList")
             .then( (res) =>{
@@ -193,7 +212,7 @@ export default {  //曝光组件
          this.ArrData[i].productNum++
       },
       subtraction(i) { //点击了减少购物车数据事件
-        if((this.ArrData[i].productNum)<=0){
+        if((this.ArrData[i].productNum)<=1){
            return
         }
           this.ArrData[i].productNum--    //不能放if里去。
