@@ -31,12 +31,12 @@
                         </ul>
                     </div>
                     <ul class="cart-item-list">
-                        <li v-for="(item,index) in ArrData">
+                        <li v-for="(item,index) in ArrData" v-bind:key="index">
                             <div class="cart-tab-1">
                                 <div class="cart-item-check">
                                     <a href="javascipt:;" class="checkbox-btn item-check-btn"
                                         v-bind:class="item.checked?'check':''"
-                                        v-on:click="item.checked=!item.checked"
+                                        v-on:click="clickchecked(index)"
                                     >
                                         <svg class="icon icon-ok">
                                             <use xlink:href="#icon-ok"></use>
@@ -167,7 +167,10 @@ export default {  //曝光组件
       sum:function(){
         var s = 0     //遍历循环购物车样品数量，然后加上所以数。
         for(var i= 0;i<this.ArrData.length;i++){
-            s += (this.ArrData[i].productNum)*(this.ArrData[i].salePrice)
+            var item = this.ArrData[i] //等于当前点击的对象
+            if(item.checked){           //如果勾选上了，然后执行下面的。
+                s += (this.ArrData[i].productNum)*(this.ArrData[i].salePrice)
+            }
         }
        //console.log(s)
        return s
@@ -178,6 +181,11 @@ export default {  //曝光组件
   },
   //方法
   methods:{
+      //当没有勾选上，总价的价格就不加
+      clickchecked(index){
+          var item = this.ArrData[index]
+          item.checked=!item.checked
+      },
       //购物车删除功能
       del(i){
           //alert(i) //测试
