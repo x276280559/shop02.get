@@ -59,7 +59,7 @@
                                     <div class="name">{{goods.productName}}</div>
                                     <div class="price">{{goods.salePrice | money}}</div>
                                     <div class="btn-area">
-                                        <a href="javascript:;" class="btn btn--m">加入购物车</a>
+                                        <a href="javascript:;" class="btn btn--m" v-on:click="addcart(goods.productId)">加入购物车</a>
                                     </div>
                                 </div>
                             </li>
@@ -119,13 +119,35 @@ export default {
           goodsLists:[]  //商品数量
       }
   },
-  mounted(){    //挂载后，再获取后台元素
+  mounted(){ 
+      //挂载后，再获取后台元素
       var self = this
       this.axios.get('/static/mock/mock-goods.json')
+      
         .then(function(res){
+            //console.log(res)
             //console.log(res.data.data)
            self.goodsLists = res.data.data 
         })
+  },
+  methods:{
+      addcart:function(productId){
+        // alert(productId) //检验是否会获取商品的ID
+       // alert(this.$store.state.count)
+      
+        //发送axios给后台，去添加数据到购物车
+        this.axios.post("/api/goods/addcart",{
+            productId:productId
+        })
+        .then( (res) =>{
+           // console.log(res)
+          var data = res.data
+          if(data.status==0){
+            //目的：让函数中的increment运行，+1
+            this.$store.commit("increment");
+          }
+        })
+      }
   },
   components:{
       NavMbx

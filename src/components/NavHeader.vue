@@ -34,7 +34,7 @@
             <div class="topbar-cart" id="ECS_CARTINFO">
                 <a class="cart-mini " href="/#/Cart">
                     <i class="iconfont">&#xe60c;</i> 购物车
-                    <span class="mini-cart-num J_cartNum" id="hd_cartnum">(0)</span>
+                    <span class="mini-cart-num J_cartNum" id="hd_cartnum">({{carnub}})</span>
                 </a>
             </div>
             <div class="topbar-info J_userInfo" id="ECS_MEMBERZONE" v-show="userName==''">
@@ -72,7 +72,16 @@ export default {
             userName:""
         }
     },
-    mounted:function(){   //检查是否登录接口 ajax 获取数据
+    computed:{
+        carnub(){
+           return this.$store.state.count
+        }
+    },
+    mounted:function(){
+        //能获取到自定义的全局store组件 
+        //alert(this.$store.state.count)
+    
+    //检查是否登录接口 ajax 获取数据
     //用处：当登录进去后，刷新页面不会造成页面登录接口退出来。
         this.axios.get("/api/users/checkLogin")
             .then( (res) => {

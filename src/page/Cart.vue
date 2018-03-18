@@ -181,7 +181,7 @@ export default {  //曝光组件
       loadData(){
           this.axios.get("/api/users/cartList")
             .then( (res) =>{
-               //console.log(res)
+               console.log(res)
                 this.ArrData = res.data.result
                 // console.log(this.ArrData)
             })
