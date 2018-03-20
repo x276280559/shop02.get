@@ -118,7 +118,7 @@ export default {
         ShowModal: function () {  //打开
             this.ShowLogin = true
         },
-            closeModal: function () {  //关闭登录对话框
+        closeModal: function () {  //关闭登录对话框
             this.ShowLogin = false
         },
     // qhuan: function(e){  //传用户名数据过来

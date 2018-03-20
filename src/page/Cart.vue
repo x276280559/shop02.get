@@ -121,11 +121,11 @@
                 <div class="cart-foot-inner">
                     <div class="cart-foot-l">
                         <div class="item-all-check">
-                            <a href="javascipt:;">
-                                <span class="checkbox-btn item-check-btn">
-                      <svg class="icon icon-ok"><use xlink:href="#icon-ok"/></svg>
-                  </span>
-                  <span>全选</span>
+                            <a href="javascipt:;" v-on:click="quanxuan">
+                                <span class="checkbox-btn item-check-btn" v-bind:class="allclickchecked?'check':''">
+                                    <svg class="icon icon-ok"><use xlink:href="#icon-ok"/></svg>
+                                </span>
+                                <span>全选</span>
                             </a>
                         </div>
                     </div>
@@ -164,6 +164,19 @@ export default {  //曝光组件
   },
   //计算后的方法，用来计算购物车总价数
   computed:{
+       //判断是否全部选择
+      allclickchecked(){
+          var flag = true    //自定义
+          for(var i= 0;i<this.ArrData.length;i++){
+             //判断是否全部选择 
+              var item = this.ArrData[i]
+              if(item.checked==false){
+                  flag =false ;   //说明至少有一个未勾选上
+                  break;
+              }
+           }
+           return flag;
+      },
       sum:function(){
         var s = 0     //遍历循环购物车样品数量，然后加上所以数。
         for(var i= 0;i<this.ArrData.length;i++){
@@ -181,50 +194,81 @@ export default {  //曝光组件
   },
   //方法
   methods:{
-      //当没有勾选上，总价的价格就不加
-      clickchecked(index){
-          var item = this.ArrData[index]
-          item.checked=!item.checked
-      },
-      //购物车删除功能
-      del(i){
-          //alert(i) //测试
-          var productId = this.ArrData[i].productId   //获取下标ID
-          this.axios.post("/api/users/cartDel",{
-              productId:productId     //发送ID给后台去请求
-          }).then( (res)=>{
-              console.log(res) 
-              var data = res.data
-              console.log(data)
-              if(data.status==0){  //当请求数据成功删除
-                 //再删除界面的列表商品
-                  //this.ArrData[i].remove()    擦。remove是jQuery方法，不能用在这里，下次注意！！
-                  this.ArrData.splice(i,1)   //用数组方法清除
-              }
-              
-          })
-      },
-      //挂载后，请求数据回来
-      loadData(){
-          this.axios.get("/api/users/cartList")
-            .then( (res) =>{
-               console.log(res)
-                this.ArrData = res.data.result
-                // console.log(this.ArrData)
-            })
-      },
-      add(i) {    //点击了增加购物车数据事件
-         // console.log("点击了增加数据事件")
-        // console.log(this.ArrData[i].productNum++)
-        //event.preventDefault()
-         this.ArrData[i].productNum++
-      },
-      subtraction(i) { //点击了减少购物车数据事件
-        if((this.ArrData[i].productNum)<=1){
-           return
-        }
-          this.ArrData[i].productNum--    //不能放if里去。
-      }
+    quanxuan:function(){
+       //alert()
+      //默认初始值为全选
+       var sta = this.allclickchecked
+       //状态反转
+       sta = !sta
+       for(var i=0;i<this.ArrData.length;i++){
+         var item = this.ArrData[i]
+         item.checked = sta
+       }
+    },
+    //当没有勾选上，总价的价格就不加
+    clickchecked(index){
+        var item = this.ArrData[index]
+        item.checked=!item.checked
+    },
+    //购物车删除功能
+    del(i){
+        //alert(i) //测试
+        var productId = this.ArrData[i].productId   //获取下标ID
+        this.axios.post("/api/users/cartDel",{
+            productId:productId     //发送ID给后台去请求
+        }).then( (res)=>{
+            console.log(res) 
+            var data = res.data
+            console.log(data)
+            if(data.status==0){  //当请求数据成功删除
+                //再删除界面的列表商品
+                //this.ArrData[i].remove()    擦。remove是jQuery方法，不能用在这里，下次注意！！
+                this.ArrData.splice(i,1)   //用数组方法清除
+            }
+            //更新购物车数量
+            this.$store.commit("update",this.ArrData.length) 
+        })
+    },
+    //挂载后，请求数据回来
+    loadData(){
+        this.axios.get("/api/users/cartList")
+        .then( (res) =>{
+            console.log(res)
+            this.ArrData = res.data.result
+            // console.log(this.ArrData)
+            //更新购物车数量
+            this.$store.commit("update",this.ArrData.length)
+        })
+    },
+    add(i) {    //点击了增加购物车数据事件
+        // console.log("点击了增加数据事件")
+    // console.log(this.ArrData[i].productNum++)
+    //event.preventDefault()
+        var item = this.ArrData[i]
+       this.axios.post("/api/users/cartEdit",{
+           productId:item.productId,
+           checked:item.checked,
+           productNum:parseInt(item.productNum) +1
+       }).then( (res)=>{
+           item.productNum++
+       }) 
+        
+    },
+    subtraction(i) { //点击了减少购物车数据事件
+    if((this.ArrData[i].productNum)<=1){
+        return
+    }
+       var item = this.ArrData[i]
+       this.axios.post("/api/users/cartEdit",{
+           productId:item.productId,
+           checked:item.checked,
+           //字符串，必须转为数字 parseInt
+           productNum:parseInt(item.productNum) -1
+       }).then( (res)=>{
+           item.productNum-- //不能放if里去。
+       }) 
+      
+    }
   }
 }
 </script>

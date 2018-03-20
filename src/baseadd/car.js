@@ -12,6 +12,10 @@ const store = new Vuex.Store({
     mutations: {
       increment (state) {  //改变状态用的。
         return state.count++
+      },
+      //更新函数
+      update(state,n){
+        state.count =n
       }
     }
   })
